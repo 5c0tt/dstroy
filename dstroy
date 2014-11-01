@@ -1,0 +1,40 @@
+#!/bin/bash
+echo ""
+echo "Hello, today is: $(date)"
+echo ""
+# How many arguments were passed in, as we only ever want 1 and only 1
+# This is a directory path, so it has to be one, as I have not coded this 
+# to run the commands across more than one supplied path.
+
+number_of_args=$#
+arg=$1
+echo "Number of args passed in:                 $number_of_args"
+echo "Argument passed in:                       $arg"
+
+# Protection, should not be able to grt past this without the user entering in a path
+if [[ "$number_of_args" != "1" ]]
+then
+	echo "Invalid path specified or no path given, please suplpy one argument, for exampple:"
+	echo ./dstroy .				# Looks in curreny direcory
+	echo ./dstroy ~				# Looks in your HOME direcory
+	echo ./dstroy ~/DropBox		# Looks in a specific directory
+	echo
+	exit 1 # Fail the script, who knows what happens if this mess has no particular location to look at
+	# I should set a default...
+else
+	$arg=/tmp
+fi
+
+# Find all .DS_Store files at given path of $arg
+echo "Finding all .DS_Store files in:           $arg"
+find $arg -name .DS_Store -exec rm -fi {} \;
+
+echo ""
+Echo "Now locating large files..."
+find $arg -type f -size +500k -exec du -h {} \; | grep -v '\.dropbox\.cache' > /tmp/dstroy.tmp
+echo "Log file of all large files saved to /tmp/dstroy.tmp"
+
+# Sort the file with largest at top, rename the file, and cleanup.
+sort --ignore-leading-blanks --ignore-case --numeric-sort --reverse --output=/tmp/dstroy.sorted.log /tmp/dstroy.tmp
+mate /tmp/dstroy.sorted.log
+exit 0 # I think zero is sucess, not sure why not one, but ev's.
