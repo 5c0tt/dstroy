@@ -21,8 +21,6 @@ then
 	echo
 	exit 1 # Fail the script, who knows what happens if this mess has no particular location to look at
 	# I should set a default...
-else
-	$arg=/tmp
 fi
 
 # Find all .DS_Store files at given path of $arg
